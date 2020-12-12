@@ -1,0 +1,461 @@
+﻿// 각 클래스 쪼개기
+
+    public enum CRAFT_TYPE
+    {
+        FORGE,
+        ALCHMIC,
+        SEWING,
+        NONE
+    }
+
+    [SerializeField]
+    private CRAFT_TYPE type = CRAFT_TYPE.NONE;
+    // Crafting Item Slot
+    private Image mCraftItemImg;
+    public Items CraftItem { get; private set; } = null;
+
+    // Crafting Select Item Window
+    private List<Items> mCraftItemList = new List<Items>();
+    private GameObject mSelectWindow;
+    private List<Image> mCraftSlot = new List<Image>();
+    private int curId = 0;
+
+    public void Init()
+    {
+        mCraftItemImg = transform.Find("Slot_CraftingItem").Find("Image_Item").GetComponent<Image>();
+        mSelectWindow = transform.Find("Select_CraftingItem").gameObject;
+
+        MakeCraftItemList();
+
+        Image[] tSlot = mSelectWindow.transform.Find("Item_Grid").GetComponentsInChildren<Image>();
+
+        int tId = 0;
+        for (int i = 0; i < tSlot.Length; i++)
+        {
+            if (tSlot[i].GetComponent<Button>()) continue;
+            tSlot[i].sprite = mCraftItemList[tId].Sprite;
+            mCraftSlot.Add(tSlot[i]);
+            tId++;
+        }
+    }
+
+    private void MakeCraftItemList()
+    {
+        switch (type)
+        {
+            case CRAFT_TYPE.FORGE:
+                {
+                    mCraftItemList.AddRange(GameManager.Instance.ObjPool.GetItems(Items.ITEM_TYPE.TOOL));
+                    mCraftItemList.AddRange(GameManager.Instance.ObjPool.GetItems(Items.ITEM_TYPE.SWORD));
+                    mCraftItemList.AddRange(GameManager.Instance.ObjPool.GetItems(Items.ITEM_TYPE.SPEAR));
+                    mCraftItemList.AddRange(GameManager.Instance.ObjPool.GetItems(Items.ITEM_TYPE.AXE));
+                    mCraftItemList.AddRange(GameManager.Instance.ObjPool.GetItems(Items.ITEM_TYPE.HELM));
+                    mCraftItemList.AddRange(GameManager.Instance.ObjPool.GetItems(Items.ITEM_TYPE.ARMOR));
+                    mCraftItemList.AddRange(GameManager.Instance.ObjPool.GetItems(Items.ITEM_TYPE.SHOES));
+                    mCraftItemList.AddRange(GameManager.Instance.ObjPool.GetItems(Items.ITEM_TYPE.SHIELD));
+                }
+                break;
+            case CRAFT_TYPE.ALCHMIC:
+                {
+                    mCraftItemList.AddRange(GameManager.Instance.ObjPool.GetItems(Items.ITEM_TYPE.MEDICINE));
+                }
+                break;
+            case CRAFT_TYPE.SEWING:
+                {
+                    mCraftItemList.Add(GameManager.Instance.ObjPool.GetItem("옷감"));
+                }
+                break;
+            default:
+                Debug.Log("제작 타입을 설정하시오");
+                break;
+        }
+    }
+
+    private void SetAlpha(Image img, float alpha)
+    {
+        Color c = img.color;
+        c.a = alpha;
+        img.color = c;
+    }
+
+    // Show Window ======================================================================================
+    public void ShowSelectWindow()
+    {
+        if (mSelectWindow.activeSelf)
+            mSelectWindow.SetActive(false);
+        else
+            mSelectWindow.SetActive(true);
+
+        ResetCraftSlot();
+    }
+    // Show Window ======================================================================================
+
+    // Craft Select Arrow ================================================================================
+    private void ResetCraftSlot()
+    {
+        if (curId != 0)
+        {
+            curId = 0;
+
+            for (int i = 0; i < mCraftSlot.Count; i++)
+            {
+                mCraftSlot[i].sprite = mCraftItemList[curId + i].Sprite;
+            }
+        }
+    }
+
+    public void PrevMoveList()
+    {
+        curId--;
+        if (curId < 0)
+            curId = mCraftItemList.Count - 1;
+
+        for (int i = 0; i < mCraftSlot.Count; i++)
+        {
+            int tId = curId + i;
+            if (tId >= mCraftItemList.Count)
+                tId = tId - mCraftItemList.Count;
+
+            mCraftSlot[i].sprite = mCraftItemList[tId].Sprite;
+        }
+    }
+
+    public void NextMoveList()
+    {
+        curId++;
+        if (curId >= mCraftItemList.Count)
+            curId = 0;
+
+        for (int i = 0; i < mCraftSlot.Count; i++)
+        {
+            int tId = curId + i;
+            if (tId >= mCraftItemList.Count)
+                tId = tId - mCraftItemList.Count;
+
+            mCraftSlot[i].sprite = mCraftItemList[tId].Sprite;
+        }
+    }
+
+    // Craft Select Arrow ================================================================================
+
+    // Craft Select Slot =================================================================================
+    public void SelectCraftItem(int index)
+    {
+        int tId = index + curId;
+        if (tId >= mCraftItemList.Count)
+            tId = tId - mCraftItemList.Count;
+
+        CraftItem = mCraftItemList[tId];
+        mCraftItemImg.sprite = CraftItem.Sprite;
+        SetAlpha(mCraftItemImg, 1f);
+
+        ResetCraftSlot();
+        mSelectWindow.SetActive(false);
+    }
+    // Craft Select Slot =================================================================================
+
+
+
+	private CraftItem craftItem;
+    private CraftRecipe recipe;
+    private CraftAccept accept;
+    private CraftProcessing processing;
+    public Items CurItem { get; private set; } = null;
+
+    public delegate void SendItemRecipe(List<List<Items.ITEM_TYPE>> recipe);
+    public event SendItemRecipe sendRecipeHandler;
+
+    public void Init()
+    {
+        craftItem = GetComponentInChildren<CraftItem>();
+        recipe = GetComponentInChildren<CraftRecipe>();
+        accept = GetComponentInChildren<CraftAccept>();
+        processing = GetComponentInChildren<CraftProcessing>();
+
+        craftItem.Init();
+        recipe.Init();
+        accept.Init();
+        processing.Init();
+
+        SelectCraftItemSlot[] temp = craftItem.transform.Find("Select_CraftingItem").GetComponentsInChildren<SelectCraftItemSlot>();
+        for (int i = 0; i < temp.Length; i++)
+        {
+            temp[i].selectHandler += SetCurItem;
+        }
+
+        processing.resetHandler += craftItem.ResetCraft;
+        processing.resetHandler += recipe.ResetRecipe;
+    }
+
+    private void SetCurItem(int id)
+    {
+        CurItem = craftItem.GetCraftItem(id);
+        sendRecipeHandler(CreateRecipe(CurItem));
+    }
+
+    private List<List<Items.ITEM_TYPE>> CreateRecipe(Items item)
+    {
+        List<List<Items.ITEM_TYPE>> mRecipe = new List<List<Items.ITEM_TYPE>>();
+
+        switch (item.Name)
+        {
+            default:
+                mRecipe = null;
+                break;
+            case "숏소드":
+            case "숏스피어":
+            case "라지액스":
+                {
+                    List<Items.ITEM_TYPE> fTemp = new List<Items.ITEM_TYPE>();
+                    fTemp.Add(Items.ITEM_TYPE.ORE);
+                    fTemp.Add(Items.ITEM_TYPE.WOOD);
+                    fTemp.Add(Items.ITEM_TYPE.GEM);
+
+                    List<Items.ITEM_TYPE> sTemp = new List<Items.ITEM_TYPE>();
+                    sTemp.Add(Items.ITEM_TYPE.ORE);
+                    sTemp.Add(Items.ITEM_TYPE.ORE);
+                    sTemp.Add(Items.ITEM_TYPE.GEM);
+
+                    mRecipe.Add(fTemp);
+                    mRecipe.Add(sTemp);
+                }
+                break;
+            case "롱소드":
+            case "롱스피어":
+            case "배틀액스":
+                {
+                    List<Items.ITEM_TYPE> fTemp = new List<Items.ITEM_TYPE>();
+                    fTemp.Add(Items.ITEM_TYPE.ORE);
+                    fTemp.Add(Items.ITEM_TYPE.ORE);
+                    fTemp.Add(Items.ITEM_TYPE.WOOD);
+                    fTemp.Add(Items.ITEM_TYPE.GEM);
+
+                    List<Items.ITEM_TYPE> sTemp = new List<Items.ITEM_TYPE>();
+                    sTemp.Add(Items.ITEM_TYPE.ORE);
+                    sTemp.Add(Items.ITEM_TYPE.ORE);
+                    sTemp.Add(Items.ITEM_TYPE.ORE);
+                    sTemp.Add(Items.ITEM_TYPE.GEM);
+
+                    mRecipe.Add(fTemp);
+                    mRecipe.Add(sTemp);
+                }
+                break;
+            case "숏보우":
+                {
+                    List<Items.ITEM_TYPE> fTemp = new List<Items.ITEM_TYPE>();
+                    fTemp.Add(Items.ITEM_TYPE.CLOTH);
+                    fTemp.Add(Items.ITEM_TYPE.WOOD);
+                    fTemp.Add(Items.ITEM_TYPE.GEM);
+
+                    List<Items.ITEM_TYPE> sTemp = new List<Items.ITEM_TYPE>();
+                    fTemp.Add(Items.ITEM_TYPE.CLOTH);
+                    fTemp.Add(Items.ITEM_TYPE.ORE);
+                    sTemp.Add(Items.ITEM_TYPE.GEM);
+
+                    mRecipe.Add(fTemp);
+                    mRecipe.Add(sTemp);
+                }
+                break;
+            case "롱보우":
+                {
+                    List<Items.ITEM_TYPE> fTemp = new List<Items.ITEM_TYPE>();
+                    fTemp.Add(Items.ITEM_TYPE.BONE);
+                    fTemp.Add(Items.ITEM_TYPE.CLOTH);
+                    fTemp.Add(Items.ITEM_TYPE.WOOD);
+                    fTemp.Add(Items.ITEM_TYPE.GEM);
+
+                    List<Items.ITEM_TYPE> sTemp = new List<Items.ITEM_TYPE>();
+                    fTemp.Add(Items.ITEM_TYPE.BONE);
+                    fTemp.Add(Items.ITEM_TYPE.CLOTH);
+                    fTemp.Add(Items.ITEM_TYPE.ORE);
+                    sTemp.Add(Items.ITEM_TYPE.GEM);
+
+                    mRecipe.Add(fTemp);
+                    mRecipe.Add(sTemp);
+                }
+                break;
+            case "레더헬름":
+            case "레더아머":
+            case "레더슈즈":
+                {
+                    List<Items.ITEM_TYPE> fTemp = new List<Items.ITEM_TYPE>();
+                    fTemp.Add(Items.ITEM_TYPE.LEATHER);
+                    fTemp.Add(Items.ITEM_TYPE.WOOD);
+                    fTemp.Add(Items.ITEM_TYPE.GEM);
+
+                    List<Items.ITEM_TYPE> sTemp = new List<Items.ITEM_TYPE>();
+                    sTemp.Add(Items.ITEM_TYPE.LEATHER);
+                    sTemp.Add(Items.ITEM_TYPE.BONE);
+                    sTemp.Add(Items.ITEM_TYPE.GEM);
+
+                    mRecipe.Add(fTemp);
+                    mRecipe.Add(sTemp);
+                }
+                break;
+            case "풀헬름":
+            case "그리브":
+                {
+                    List<Items.ITEM_TYPE> fTemp = new List<Items.ITEM_TYPE>();
+                    fTemp.Add(Items.ITEM_TYPE.ORE);
+                    fTemp.Add(Items.ITEM_TYPE.ORE);
+                    fTemp.Add(Items.ITEM_TYPE.GEM);
+
+                    mRecipe.Add(fTemp);
+                }
+                break;
+            case "플레이트아머":
+                {
+                    List<Items.ITEM_TYPE> fTemp = new List<Items.ITEM_TYPE>();
+                    fTemp.Add(Items.ITEM_TYPE.ORE);
+                    fTemp.Add(Items.ITEM_TYPE.ORE);
+                    fTemp.Add(Items.ITEM_TYPE.ORE);
+                    fTemp.Add(Items.ITEM_TYPE.GEM);
+
+                    mRecipe.Add(fTemp);
+                }
+                break;
+            case "버클러":
+                {
+                    List<Items.ITEM_TYPE> fTemp = new List<Items.ITEM_TYPE>();
+                    fTemp.Add(Items.ITEM_TYPE.WOOD);
+                    fTemp.Add(Items.ITEM_TYPE.WOOD);
+                    fTemp.Add(Items.ITEM_TYPE.GEM);
+
+                    List<Items.ITEM_TYPE> sTemp = new List<Items.ITEM_TYPE>();
+                    sTemp.Add(Items.ITEM_TYPE.WOOD);
+                    sTemp.Add(Items.ITEM_TYPE.ORE);
+                    sTemp.Add(Items.ITEM_TYPE.GEM);
+
+                    List<Items.ITEM_TYPE> tTemp = new List<Items.ITEM_TYPE>();
+                    tTemp.Add(Items.ITEM_TYPE.WOOD);
+                    tTemp.Add(Items.ITEM_TYPE.BONE);
+                    tTemp.Add(Items.ITEM_TYPE.GEM);
+
+                    mRecipe.Add(fTemp);
+                    mRecipe.Add(sTemp);
+                    mRecipe.Add(tTemp);
+                }
+                break;
+            case "모나크":
+                {
+                    List<Items.ITEM_TYPE> fTemp = new List<Items.ITEM_TYPE>();
+                    fTemp.Add(Items.ITEM_TYPE.WOOD);
+                    fTemp.Add(Items.ITEM_TYPE.WOOD);
+                    fTemp.Add(Items.ITEM_TYPE.ORE);
+                    fTemp.Add(Items.ITEM_TYPE.GEM);
+
+                    List<Items.ITEM_TYPE> sTemp = new List<Items.ITEM_TYPE>();
+                    sTemp.Add(Items.ITEM_TYPE.WOOD);
+                    sTemp.Add(Items.ITEM_TYPE.ORE);
+                    sTemp.Add(Items.ITEM_TYPE.ORE);
+                    sTemp.Add(Items.ITEM_TYPE.GEM);
+
+                    List<Items.ITEM_TYPE> tTemp = new List<Items.ITEM_TYPE>();
+                    tTemp.Add(Items.ITEM_TYPE.BONE);
+                    tTemp.Add(Items.ITEM_TYPE.ORE);
+                    tTemp.Add(Items.ITEM_TYPE.ORE);
+                    tTemp.Add(Items.ITEM_TYPE.GEM);
+
+                    mRecipe.Add(fTemp);
+                    mRecipe.Add(sTemp);
+                    mRecipe.Add(tTemp);
+                }
+                break;
+            case "하급체력물약":
+            case "하급마나물약":
+            case "체력물약":
+            case "마나물약":
+                {
+                    List<Items.ITEM_TYPE> fTemp = new List<Items.ITEM_TYPE>();
+                    fTemp.Add(Items.ITEM_TYPE.MEDICINALHERB);
+                    fTemp.Add(Items.ITEM_TYPE.MEDICINALHERB);
+
+                    mRecipe.Add(fTemp);
+                }
+                break;
+            case "상급체력물약":
+            case "상급마나물약":
+                {
+                    List<Items.ITEM_TYPE> fTemp = new List<Items.ITEM_TYPE>();
+                    fTemp.Add(Items.ITEM_TYPE.MEDICINALHERB);
+                    fTemp.Add(Items.ITEM_TYPE.MEDICINALHERB);
+                    fTemp.Add(Items.ITEM_TYPE.MEDICINALHERB);
+
+                    mRecipe.Add(fTemp);
+                }
+                break;
+            case "엘릭서":
+                {
+                    List<Items.ITEM_TYPE> fTemp = new List<Items.ITEM_TYPE>();
+                    fTemp.Add(Items.ITEM_TYPE.MEDICINALHERB);
+                    fTemp.Add(Items.ITEM_TYPE.MEDICINALHERB);
+                    fTemp.Add(Items.ITEM_TYPE.MEDICINALHERB);
+                    fTemp.Add(Items.ITEM_TYPE.GEM);
+
+                    mRecipe.Add(fTemp);
+                }
+                break;
+            case "곡괭이":
+            case "도끼":
+            case "삽":
+            case "망치":
+                {
+                    List<Items.ITEM_TYPE> fTemp = new List<Items.ITEM_TYPE>();
+                    fTemp.Add(Items.ITEM_TYPE.WOOD);
+                    fTemp.Add(Items.ITEM_TYPE.ORE);
+
+                    mRecipe.Add(fTemp);
+                }
+                break;
+        }
+
+        return mRecipe;
+    }
+
+	using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+
+public class CraftItemSlot : MonoBehaviour, IPointerDownHandler
+{
+    // Craft Item Slot
+    private SelectCraftItem selectWindow;
+    private Image mCraftItemImg;
+
+    public void Init()
+    {
+        selectWindow = transform.parent.Find("Select_CraftingItem").GetComponent<SelectCraftItem>();
+        mCraftItemImg = transform.GetChild(0).GetComponent<Image>();
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        if (selectWindow.gameObject.activeSelf)
+            selectWindow.gameObject.SetActive(false);
+        else
+            selectWindow.gameObject.SetActive(true);
+    }
+
+    public void ChangeSprite(Sprite sprite, float a = 1)
+    {
+        mCraftItemImg.sprite = sprite;
+        if (!sprite)
+            a = 0;
+        SetAlpha(a);
+    }
+
+    public void ResetImage()
+    {
+        mCraftItemImg.sprite = null;
+        SetAlpha(0f);
+    }
+
+    private void SetAlpha(float a)
+    {
+        Color c = mCraftItemImg.color;
+        c.a = a;
+        mCraftItemImg.color = c;
+    }
+}

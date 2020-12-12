@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd283dc42daa99346b8058b6394e6fd7, type: 3}
+  m_Name: Item_Gold
+  m_EditorClassIdentifier: 
+  mKind: 0
+  mType: 1
+  mDetail: 0
+  mSprite: {fileID: 8616416941831027937, guid: d38cfdeae77c5d24e8b6befdd24d65c5, type: 3}
+  mItemName: "\uAE08"
+  mTier: 1
+  mOriginValue: 0
+  mValue: 30
+  mCraftPlace: 0
+  mIsUnlock: 0
+  mRecipe:
+  - Recipe: 01000000
+    SpecialRecipe: []

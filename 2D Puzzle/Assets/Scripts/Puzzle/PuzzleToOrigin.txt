@@ -1,0 +1,345 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class Puzzle : MenuController
+{
+    private RectTransform mBlock;
+    private RectTransform mRoad;
+
+    private List<List<PuzzleRoad>> mTotalRoad = new List<List<PuzzleRoad>>();
+    public List<List<PuzzleRoad>> TotalRoad { get { return mTotalRoad; } private set { mTotalRoad = value; } }
+    private Dictionary<Vector2Int, PuzzleRoad> mOpenList = new Dictionary<Vector2Int, PuzzleRoad>();
+    private Dictionary<Vector2Int, PuzzleRoad> mCloseList = new Dictionary<Vector2Int, PuzzleRoad>();
+
+    public Dictionary<Vector2Int, PuzzleRoad> mResult = new Dictionary<Vector2Int, PuzzleRoad>();
+
+    static public PuzzleRoad Start { get; set; } = null;
+    static public PuzzleRoad End { get; set; } = null;
+    private PuzzleRoad current = null;
+    private int turnCount = 0;
+    [HideInInspector]
+    public bool IsCorrect = false;
+
+    public override void Init()
+    {
+        base.Init();
+        mBlock = transform.Find("BlockList").GetComponent<RectTransform>();
+        mRoad = transform.Find("MoveRoad").GetComponent<RectTransform>();
+        MakePuzzleRoad();
+    }
+
+    private void OnEnable()
+    {
+        StartCoroutine(PathFindCoroutine());
+        StartCoroutine(DrawResultRoadCoroutine());
+    }
+
+    private void Update()
+    {
+        if (Input.GetKey(KeyCode.A))
+        {
+            foreach(List<PuzzleRoad> t in mTotalRoad)
+            {
+                foreach(PuzzleRoad t1 in t)
+                {
+                    t1.ResetRoad();
+                    t1.TestActivatingLine(false);
+                    t1.text.text = "";
+                }
+            }
+        }
+    }
+
+    private void MakePuzzleRoad()
+    {
+        GridLayoutGroup grid = mRoad.GetComponent<GridLayoutGroup>();
+        Vector2 cellSize = grid.cellSize;
+        Vector2 spacing = grid.spacing;
+        int tX = (int)(mRoad.sizeDelta.x / (cellSize.x + spacing.x));
+        int tY = (int)(mRoad.sizeDelta.y / (cellSize.y + spacing.y));
+
+        PuzzleRoad[] roads = mRoad.GetComponentsInChildren<PuzzleRoad>();
+        PuzzleBlock[] blocks = mBlock.GetComponentsInChildren<PuzzleBlock>();
+
+        for (int y = 0; y < tY; y++)
+        {
+            List<PuzzleRoad> temp = new List<PuzzleRoad>();
+            for (int x = 0; x < tX; x++)
+            {
+                PuzzleRoad tRoad = roads[(y * tX) + x];
+                tRoad.Id = new Vector2Int(x, y);
+
+                if ((x > 0 && y > 0) && (x < tX - 1 && y < tY - 1))
+                {
+                    tRoad.Block = blocks[((y - 1) * (tX - 2)) + (x - 1)];
+                    tRoad.Block.Init();
+                    tRoad.Block.Road = tRoad;
+                    tRoad.Block.Item = ItemFactory.Instance.FindEnableUseItem(Items.ITEM_KIND.RESOURCE);
+                    if (tRoad.Block.itemImg)
+                    {
+                        tRoad.Block.itemImg.sprite = tRoad.Block.Item.Sprite;
+                        tRoad.IsClose = true;
+                    }
+                    else
+                    {
+                        ItemFactory.Instance.RegistRespawnBlock(tRoad.Block);
+                        tRoad.Block.gameObject.SetActive(false);
+                        tRoad.IsClose = false;
+                    }
+                }
+
+                tRoad.Init();
+                temp.Add(tRoad);
+            }
+            mTotalRoad.Add(temp);
+        }
+    }
+
+    private IEnumerator PathFindCoroutine()
+    {
+        yield return null;
+
+        WaitUntil wu = new WaitUntil(() => Start && End);
+
+        while (true)
+        {
+            yield return wu;
+
+            if (Start.Id == End.Id ||
+                Start.Block.Item.Name != End.Block.Item.Name)
+            {
+                Start.Block.UnSelect();
+                End.Block.UnSelect();
+                Start = null;
+                End = null;
+                continue;
+            }
+
+            current = Start;
+            mCloseList.Add(Start.Id, Start);
+            
+            PathFinding(current);
+        }
+        
+    }
+
+    private void PathFinding(PuzzleRoad cur)
+    {
+        AddOpenList(cur);
+        PuzzleRoad temp = ChkBetterRoad();
+
+        if (!temp)
+        {
+            ResetList();
+            return;
+        }
+
+        if(temp == End)
+        {
+            AddResult(temp);
+            if (ChkCorrectPath()) return;
+            else
+                temp = current;
+        }
+
+        current = temp;
+        mOpenList.Remove(current.Id);
+
+        if (!mCloseList.ContainsKey(current.Id))
+            mCloseList.Add(current.Id, current);
+
+        PathFinding(current);
+    }
+
+    private PuzzleRoad ChkBetterRoad()
+    {
+        float totalCost = 999999f;
+        PuzzleRoad result = null;
+
+        foreach(KeyValuePair<Vector2Int, PuzzleRoad> openRoad in mOpenList)
+        {
+            PuzzleRoad temp = openRoad.Value;
+
+            if (temp.TotalDist < totalCost)
+            {
+                totalCost = temp.TotalDist;
+                result = temp;
+            }
+        }
+        
+        return result;
+    }
+
+    private void AddOpenList(PuzzleRoad cur)
+    {
+        for (int y = -1; y <= 1; y++)
+        {
+            for (int x = -1; x <= 1; x++)
+            {
+                if (x == 0 && y == 0) continue;
+                if (Mathf.Abs(x + y) != 1) continue;
+
+                Vector2Int tId = new Vector2Int(cur.Id.x + x, cur.Id.y + y);
+                if (tId.y < 0 || tId.y >= mTotalRoad.Count) continue;
+                if (tId.x < 0 || tId.x >= mTotalRoad[tId.y].Count) continue;
+                if (mCloseList.ContainsKey(tId)) continue;
+
+                // 여기 부분 수정해야함 (수정 완료) ========================================================
+                PuzzleRoad temp = mTotalRoad[tId.y][tId.x];
+                if (temp.IsClose) continue;
+
+                PuzzleRoad.ROAD_DIRECTION tDiretion = PuzzleRoad.ROAD_DIRECTION.NONE;
+                if (y == -1 && x == 0) tDiretion = PuzzleRoad.ROAD_DIRECTION.UP;
+                else if (y == 0 && x == -1) tDiretion = PuzzleRoad.ROAD_DIRECTION.LEFT;
+                else if (y == 0 && x == 1) tDiretion = PuzzleRoad.ROAD_DIRECTION.RIGHT;
+                else if (y == 1 && x == 0) tDiretion = PuzzleRoad.ROAD_DIRECTION.DOWN;
+
+                if (mOpenList.ContainsKey(tId))
+                {
+                    float distToStart = tDiretion == cur.Direction ? 10 + cur.DistToStart : 14 + cur.DistToStart;
+
+                    if (temp.DistToStart >= distToStart)
+                    {
+                        temp.Direction = tDiretion;
+                        temp.DistToStart = distToStart;
+                        temp.Parent = cur;
+                    }
+                }
+                else
+                {
+                    temp.Direction = tDiretion;
+                    temp.DistToStart = temp.Direction == cur.Direction ? 10 + cur.DistToStart : 14 + cur.DistToStart;
+                    temp.DistToEnd = Mathf.RoundToInt(Vector2Int.Distance(tId, End.Id) * 10);
+                    temp.Parent = cur;
+                    mOpenList.Add(tId, temp);
+                }
+                //==========================================================================
+
+                //temp.TestShowCost();
+            }
+        }
+    }
+
+    private void AddResult(PuzzleRoad final)
+    {
+        while (true)
+        {
+            mResult.Add(final.Id, final);
+            if (!final.Parent) break;
+            if (final.Direction != final.Parent.Direction)
+            {
+                turnCount++;
+                if (turnCount > 3)
+                {
+                    Debug.Log(" 삐!!");
+                    break;
+                }
+                    
+            }
+            final = final.Parent;
+        }
+
+        //ResetList();
+    }
+
+    private bool ChkCorrectPath()
+    {
+        if (turnCount > 3)
+        {
+            foreach (KeyValuePair<Vector2Int, PuzzleRoad> openRoad in mOpenList)
+            {
+                openRoad.Value.ResetRoad();
+            }
+            mOpenList.Clear();
+
+            foreach(Vector2Int key in mCloseList.Keys.ToList())
+            {
+                if (!mCloseList[key].Parent ||
+                    (mResult.ContainsKey(key) &&
+                    (Mathf.Abs((key.x - Start.Id.x) + (key.y - Start.Id.y)) == 1))) continue;
+
+                mCloseList[key].ResetRoad();
+                mCloseList.Remove(key);
+            }
+
+            mResult.Clear();
+
+            current = Start;
+            turnCount = 0;
+
+            return false;
+        }
+        else
+        {
+            ResetList();
+            return true;
+        }
+    }
+
+    private void ResetList()
+    {
+        foreach(KeyValuePair<Vector2Int, PuzzleRoad> openRoad in mOpenList)
+        {
+            if (mResult.ContainsKey(openRoad.Key)) continue;
+            openRoad.Value.ResetRoad();
+        }
+        mOpenList.Clear();
+
+        foreach (KeyValuePair<Vector2Int, PuzzleRoad> closeRoad in mCloseList)
+        {
+            if (mResult.ContainsKey(closeRoad.Key)) continue;
+            //closeRoad.Value.text.color = Color.magenta;
+            closeRoad.Value.ResetRoad();
+        }
+
+        mCloseList.Clear();
+        
+        if (mResult.Count != 0)
+        {
+            Inventory.StoreItem(Start.Block.Item);
+            Inventory.StoreItem(End.Block.Item);
+            ItemFactory.Instance.RegistRespawnBlock(Start.Block);
+            ItemFactory.Instance.RegistRespawnBlock(End.Block);
+            Start.Block.BreakBlock();
+            End.Block.BreakBlock();
+        }
+        else
+        {
+            Start.Block.UnSelect();
+            End.Block.UnSelect();
+        }
+        
+        Start = null;
+        End = null;
+        current = null;
+        turnCount = 0;
+    }
+
+    private IEnumerator DrawResultRoadCoroutine()
+    {
+        WaitUntil wu = new WaitUntil(() => mResult.Count != 0);
+
+        while (true)
+        {
+            yield return wu;
+
+            foreach (KeyValuePair<Vector2Int, PuzzleRoad> result in mResult)
+            {
+                result.Value.DrawLine();
+            }
+
+            yield return null;
+
+            foreach (KeyValuePair<Vector2Int, PuzzleRoad> result in mResult)
+            {
+                result.Value.ResetRoad();
+            }
+
+            mResult.Clear();
+        }
+    }
+}

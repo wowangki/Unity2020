@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cafe3f08dfaf0b848aa5a87830b184ed, type: 3}
+  m_Name: NPC_Charles
+  m_EditorClassIdentifier: 
+  mPrefab: {fileID: 8084976053582937658, guid: e16af4a08355e384ead513f79c99edc1, type: 3}
+  mNpcName: "\uCC30\uC2A4"
+  mUSprite:
+  - {fileID: 4883738281517220493, guid: 37bfe8f04bde89d48b65296407a6c5b9, type: 3}
+  - {fileID: 7637399825162233312, guid: 37bfe8f04bde89d48b65296407a6c5b9, type: 3}
+  - {fileID: -6286606706236374117, guid: 37bfe8f04bde89d48b65296407a6c5b9, type: 3}
+  - {fileID: -1008694815994160680, guid: 37bfe8f04bde89d48b65296407a6c5b9, type: 3}
+  - {fileID: 4677209527018168889, guid: 37bfe8f04bde89d48b65296407a6c5b9, type: 3}
+  - {fileID: -7138524466977192742, guid: 37bfe8f04bde89d48b65296407a6c5b9, type: 3}
+  mDSprite:
+  - {fileID: -7277858395544193107, guid: 37bfe8f04bde89d48b65296407a6c5b9, type: 3}
+  - {fileID: -4180323121523290617, guid: 37bfe8f04bde89d48b65296407a6c5b9, type: 3}
+  - {fileID: 9043368063068847092, guid: 37bfe8f04bde89d48b65296407a6c5b9, type: 3}
+  - {fileID: 4169353691513926900, guid: 37bfe8f04bde89d48b65296407a6c5b9, type: 3}
+  - {fileID: -3935022393251771598, guid: 37bfe8f04bde89d48b65296407a6c5b9, type: 3}
+  - {fileID: 5372496812586059742, guid: 37bfe8f04bde89d48b65296407a6c5b9, type: 3}
+  mLSprite:
+  - {fileID: -1942002220474649705, guid: 37bfe8f04bde89d48b65296407a6c5b9, type: 3}
+  - {fileID: 432929904722900149, guid: 37bfe8f04bde89d48b65296407a6c5b9, type: 3}
+  - {fileID: 7404862844515175719, guid: 37bfe8f04bde89d48b65296407a6c5b9, type: 3}
+  - {fileID: -1408003175461104252, guid: 37bfe8f04bde89d48b65296407a6c5b9, type: 3}
+  - {fileID: 6626463608443775132, guid: 37bfe8f04bde89d48b65296407a6c5b9, type: 3}
+  - {fileID: -3064931532324834880, guid: 37bfe8f04bde89d48b65296407a6c5b9, type: 3}
+  mRSprite:
+  - {fileID: -1438078247354248065, guid: 37bfe8f04bde89d48b65296407a6c5b9, type: 3}
+  - {fileID: -1414099642473341598, guid: 37bfe8f04bde89d48b65296407a6c5b9, type: 3}
+  - {fileID: -5759745697045513629, guid: 37bfe8f04bde89d48b65296407a6c5b9, type: 3}
+  - {fileID: -541248642796242519, guid: 37bfe8f04bde89d48b65296407a6c5b9, type: 3}
+  - {fileID: -5180781401980952096, guid: 37bfe8f04bde89d48b65296407a6c5b9, type: 3}
+  - {fileID: 6539105099104392927, guid: 37bfe8f04bde89d48b65296407a6c5b9, type: 3}
+  mAngryValue: 5

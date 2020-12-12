@@ -1,0 +1,30 @@
+﻿Node.NODE_DIRECTION tDir = Node.NODE_DIRECTION.NONE;
+if (y == -1 && x == 0) tDir = Node.NODE_DIRECTION.UP;
+else if (y == 0 && x == -1) tDir = Node.NODE_DIRECTION.LEFT;
+else if (y == 0 && x == 1) tDir = Node.NODE_DIRECTION.RIGHT;
+else if (y == 1 && x == 0) tDir = Node.NODE_DIRECTION.DOWN;
+
+float distToStart = tDir == cur.Direction ? 10 + cur.DistToStart : 14 + cur.DistToStart;
+if (_openList.ContainsKey(tId))
+{
+    if (temp.DistToStart >= distToStart)
+    {
+        temp.Direction = tDir;
+        temp.DistToStart = distToStart;
+        temp.Parent = cur;
+    }
+}
+else
+{
+    temp.Direction = tDir;
+    temp.DistToStart = distToStart;
+    temp.DistToEnd = Mathf.RoundToInt(Vector2Int.Distance(temp.Id, _End.Id) * 10);
+    temp.Parent = cur;
+    _openList.Add(tId, temp);
+}
+
+PuzzleRoad test = temp as PuzzleRoad;
+if (test)
+{
+    test.TestShowCost();
+}

@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd283dc42daa99346b8058b6394e6fd7, type: 3}
+  m_Name: Item_Elixir
+  m_EditorClassIdentifier: 
+  mKind: 1
+  mType: 4
+  mDetail: 13
+  mSprite: {fileID: 2971108702202312742, guid: d38cfdeae77c5d24e8b6befdd24d65c5, type: 3}
+  mItemName: "\uC5D8\uB9AD\uC11C"
+  mTier: 3
+  mOriginValue: 0
+  mValue: 200
+  mCraftPlace: 1
+  mIsUnlock: 0
+  mRecipe:
+  - Recipe: 
+    SpecialRecipe:
+    - {fileID: 11400000, guid: dc1f622f780774d40b9f608e878fedf8, type: 2}
+    - {fileID: 11400000, guid: dc1f622f780774d40b9f608e878fedf8, type: 2}
+    - {fileID: 11400000, guid: 341e6644d510bf14088284ebd6feb0e7, type: 2}
+  - Recipe: 
+    SpecialRecipe:
+    - {fileID: 11400000, guid: dc1f622f780774d40b9f608e878fedf8, type: 2}
+    - {fileID: 11400000, guid: dc1f622f780774d40b9f608e878fedf8, type: 2}
+    - {fileID: 11400000, guid: a84f6c8486c5c2247824376ea9c1892e, type: 2}
+  - Recipe: 
+    SpecialRecipe:
+    - {fileID: 11400000, guid: dc1f622f780774d40b9f608e878fedf8, type: 2}
+    - {fileID: 11400000, guid: dc1f622f780774d40b9f608e878fedf8, type: 2}
+    - {fileID: 11400000, guid: 8421aa778c5ae7b42b52f5cbc6900f76, type: 2}
+  - Recipe: 
+    SpecialRecipe:
+    - {fileID: 11400000, guid: dc1f622f780774d40b9f608e878fedf8, type: 2}
+    - {fileID: 11400000, guid: dc1f622f780774d40b9f608e878fedf8, type: 2}
+    - {fileID: 11400000, guid: 1daec876b10dbec4da7532050a0cee6a, type: 2}
+  - Recipe: 
+    SpecialRecipe:
+    - {fileID: 11400000, guid: dc1f622f780774d40b9f608e878fedf8, type: 2}
+    - {fileID: 11400000, guid: dc1f622f780774d40b9f608e878fedf8, type: 2}
+    - {fileID: 11400000, guid: e44baaf2ca6d9bd4092bc8482fd55aaf, type: 2}
+  - Recipe: 
+    SpecialRecipe:
+    - {fileID: 11400000, guid: dc1f622f780774d40b9f608e878fedf8, type: 2}
+    - {fileID: 11400000, guid: dc1f622f780774d40b9f608e878fedf8, type: 2}
+    - {fileID: 11400000, guid: c8085b498a432724cb56244098403573, type: 2}
