@@ -11,13 +11,17 @@ public class Player : MonoBehaviour
 
     private int mMyGold = 10000;
     private const int mMaxGold = 999999999;
+    public int MyGold { get { return mMyGold; } }
     private int mMyRepute = 0;
+    public int MyRepute { get { return mMyRepute; } }
     private const int mMaxRepute = 999999999;
 
     public delegate void ShowGold(int value);
     public event ShowGold GoldUIHandler;
     public delegate void ShowRepute(int value);
     public event ShowRepute ReputeUIHandler;
+    public delegate void LoadDataDel(int shopLv, int forgeLv, int alchmicLv, int sewingLv);
+    public event LoadDataDel LoadHandler;
 
     private void Awake()
     {
@@ -99,5 +103,19 @@ public class Player : MonoBehaviour
         }
 
         return true;
+    }
+
+    public void LoadData(PlayerData pl)
+    {
+        mMyGold = pl.Gold;
+        mMyRepute = pl.Repute;
+        ShopLv = pl.ShopLv;
+        ForgeLv = pl.ForgeLv;
+        AlchmicLv = pl.AlchmicLv;
+        SewingLv = pl.SewingLv;
+
+        GoldUIHandler(mMyGold);
+        ReputeUIHandler(mMyRepute);
+        LoadHandler(ShopLv, ForgeLv, AlchmicLv, SewingLv);
     }
 }

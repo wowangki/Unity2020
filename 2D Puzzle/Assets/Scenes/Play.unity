@@ -9405,7 +9405,7 @@ MonoBehaviour:
   - {fileID: -7308734352607645953, guid: d38cfdeae77c5d24e8b6befdd24d65c5, type: 3}
   - {fileID: 4991784286720688584, guid: d38cfdeae77c5d24e8b6befdd24d65c5, type: 3}
   parent: {fileID: 0}
-  mUpGold: 100
+  mDefaultGold: 100
   type: 0
 --- !u!82 &357446743
 AudioSource:
@@ -32166,7 +32166,7 @@ MonoBehaviour:
   - {fileID: -6341667737380115509, guid: d38cfdeae77c5d24e8b6befdd24d65c5, type: 3}
   - {fileID: 2739907287056457400, guid: d38cfdeae77c5d24e8b6befdd24d65c5, type: 3}
   parent: {fileID: 1985120606}
-  mUpGold: 5000
+  mDefaultGold: 5000
   type: 1
 --- !u!82 &1069430897
 AudioSource:
@@ -32868,7 +32868,7 @@ MonoBehaviour:
   - {fileID: -8973377733603954625, guid: d38cfdeae77c5d24e8b6befdd24d65c5, type: 3}
   - {fileID: -4588430514287641475, guid: d38cfdeae77c5d24e8b6befdd24d65c5, type: 3}
   parent: {fileID: 357446742}
-  mUpGold: 1000
+  mDefaultGold: 1000
   type: 3
 --- !u!82 &1091212923
 AudioSource:
@@ -35622,7 +35622,7 @@ MonoBehaviour:
   - {fileID: -1248473583632224601, guid: d38cfdeae77c5d24e8b6befdd24d65c5, type: 3}
   - {fileID: -351759329402467008, guid: d38cfdeae77c5d24e8b6befdd24d65c5, type: 3}
   parent: {fileID: 1878628177}
-  mUpGold: 5000
+  mDefaultGold: 5000
   type: 2
 --- !u!82 &1199311077
 AudioSource:
@@ -38105,7 +38105,7 @@ MonoBehaviour:
   - {fileID: -1248473583632224601, guid: d38cfdeae77c5d24e8b6befdd24d65c5, type: 3}
   - {fileID: -351759329402467008, guid: d38cfdeae77c5d24e8b6befdd24d65c5, type: 3}
   parent: {fileID: 357446742}
-  mUpGold: 1000
+  mDefaultGold: 1000
   type: 2
 --- !u!82 &1310936747
 AudioSource:
@@ -38984,7 +38984,7 @@ MonoBehaviour:
   - {fileID: -6341667737380115509, guid: d38cfdeae77c5d24e8b6befdd24d65c5, type: 3}
   - {fileID: 2739907287056457400, guid: d38cfdeae77c5d24e8b6befdd24d65c5, type: 3}
   parent: {fileID: 357446742}
-  mUpGold: 1000
+  mDefaultGold: 1000
   type: 1
 --- !u!82 &1345157725
 AudioSource:
@@ -40261,7 +40261,7 @@ MonoBehaviour:
   - {fileID: -8973377733603954625, guid: d38cfdeae77c5d24e8b6befdd24d65c5, type: 3}
   - {fileID: -4588430514287641475, guid: d38cfdeae77c5d24e8b6befdd24d65c5, type: 3}
   parent: {fileID: 1665393288}
-  mUpGold: 5000
+  mDefaultGold: 5000
   type: 3
 --- !u!82 &1370364369
 AudioSource:
@@ -50635,7 +50635,7 @@ MonoBehaviour:
   - {fileID: -8973377733603954625, guid: d38cfdeae77c5d24e8b6befdd24d65c5, type: 3}
   - {fileID: -4588430514287641475, guid: d38cfdeae77c5d24e8b6befdd24d65c5, type: 3}
   parent: {fileID: 1091212922}
-  mUpGold: 3000
+  mDefaultGold: 3000
   type: 3
 --- !u!82 &1665393289
 AudioSource:
@@ -55755,7 +55755,7 @@ MonoBehaviour:
   - {fileID: -1248473583632224601, guid: d38cfdeae77c5d24e8b6befdd24d65c5, type: 3}
   - {fileID: -351759329402467008, guid: d38cfdeae77c5d24e8b6befdd24d65c5, type: 3}
   parent: {fileID: 1310936746}
-  mUpGold: 3000
+  mDefaultGold: 3000
   type: 2
 --- !u!82 &1878628178
 AudioSource:
@@ -58062,7 +58062,7 @@ MonoBehaviour:
   - {fileID: -6341667737380115509, guid: d38cfdeae77c5d24e8b6befdd24d65c5, type: 3}
   - {fileID: 2739907287056457400, guid: d38cfdeae77c5d24e8b6befdd24d65c5, type: 3}
   parent: {fileID: 1345157724}
-  mUpGold: 3000
+  mDefaultGold: 3000
   type: 1
 --- !u!82 &1985120607
 AudioSource:

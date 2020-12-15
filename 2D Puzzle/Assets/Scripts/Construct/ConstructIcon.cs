@@ -23,8 +23,8 @@ public class ConstructIcon : MonoBehaviour
 
     private Text mUpGoldTxt;
     [SerializeField]
+    private int mDefaultGold = 0;
     private int mUpGold = 0;
-
     private AudioSource mAudio = null;
 
     public enum CONSTRUCT_TYPE
@@ -38,6 +38,7 @@ public class ConstructIcon : MonoBehaviour
 
     [SerializeField]
     private CONSTRUCT_TYPE type = CONSTRUCT_TYPE.NONE;
+    public CONSTRUCT_TYPE Type { get { return type; } }
 
     public delegate bool ChkUpgradeAble(CONSTRUCT_TYPE type, int gold);
     public event ChkUpgradeAble UpgradeHandler;
@@ -55,8 +56,7 @@ public class ConstructIcon : MonoBehaviour
         else
             Cover = transform.Find("UseableCover").GetComponent<Image>();
 
-
-
+        mUpGold = mDefaultGold;
         mUpGoldTxt = transform.Find("UpTxt").GetComponentInChildren<Text>();
         mUpGoldTxt.text = mUpGold.ToString();
         mAudio = GetComponent<AudioSource>();
@@ -118,4 +118,27 @@ public class ConstructIcon : MonoBehaviour
         }
     }
 
+    public void LoadData(int lv)
+    {
+        if(type == CONSTRUCT_TYPE.SHOP)
+        {
+            mUpGold = mDefaultGold;
+            for (int i = 1; i < lv; i++)
+            {
+                mUpGold += 100 * i;
+            }
+
+            mLvTxt.text = lv.ToString();
+            mUpGoldTxt.text = mUpGold.ToString();
+        }
+        else
+        {
+            Activate = false;
+            Cover.gameObject.SetActive(true);
+            if (lv <= 0) return;
+
+            Activate = true;
+            Cover.gameObject.SetActive(false);
+        }
+    }
 }
