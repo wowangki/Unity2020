@@ -20025,7 +20025,7 @@ MonoBehaviour:
   - {fileID: 3325946236857038282, guid: 109089955775595479b4dd422ac2787f, type: 3}
   - {fileID: 2879597153912650658, guid: 109089955775595479b4dd422ac2787f, type: 3}
   - {fileID: -1625660910913994086, guid: 109089955775595479b4dd422ac2787f, type: 3}
-  mCycleTime: 2
+  mCycleTime: 30
   mIsOpen: 1
 --- !u!114 &692001397
 MonoBehaviour:
