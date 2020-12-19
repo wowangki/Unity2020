@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1aab7072739f9654494d7d0132bbb906, type: 3}
+  m_Name: Gun_Grenade
+  m_EditorClassIdentifier: 
+  isActivated: 0
+  kind: 1
+  shootType: 0
+  range: 600
+  fireRate:
+  - 5
+  curBulletCount: 1
+  totalBulletCount: 3
+  reloadBulletCount: 1
+  maxShootBulletCount: 01000000
+  retroActionForce: 5
+  idleAccuary: 0.1
+  walkAccuary: 0.1
+  runAccuary: 0.1
+  snipeAccuary: 0.1
+  clip:
+  - {fileID: 8300000, guid: d3247579c549643a5b3a95f9224eaf3c, type: 3}
